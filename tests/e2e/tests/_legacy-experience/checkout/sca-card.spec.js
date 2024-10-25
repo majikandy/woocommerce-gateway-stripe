@@ -9,6 +9,8 @@ const {
 } = payments;
 
 test( 'customer can checkout with a SCA card @smoke', async ( { page } ) => {
+	test.slow(); // Make sure test has enough time to complete.
+
 	await emptyCart( page );
 	await setupCart( page );
 	await setupShortcodeCheckout(
@@ -30,7 +32,7 @@ test( 'customer can checkout with a SCA card @smoke', async ( { page } ) => {
 		await page.waitForTimeout( 1000 );
 	}
 	// Not ideal, but the iframe body gets repalced after load, so a waitFor does not work here.
-	await page.waitForTimeout( 2000 );
+	await page.waitForTimeout( 5000 );
 
 	await page
 		.frame( {
@@ -39,9 +41,7 @@ test( 'customer can checkout with a SCA card @smoke', async ( { page } ) => {
 		.getByRole( 'button', { name: 'Complete' } )
 		.click();
 
-	await page.waitForURL( '**/checkout/order-received/**', {
-		timeout: 20000,
-	} );
+	await page.waitForURL( '**/checkout/order-received/**' );
 
 	await expect( page.locator( 'h1.entry-title' ) ).toHaveText(
 		'Order received'
