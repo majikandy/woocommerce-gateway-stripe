@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { payments, api } from '../../../utils';
+import { payments, api, config } from '../../../utils';
 
 const {
 	setupShortcodeCheckout,
@@ -52,7 +51,9 @@ test( 'customer can purchase a subscription product @smoke @subscriptions', asyn
 	);
 
 	await page.locator( 'text=Sign up now' ).click();
-	await page.waitForNavigation();
+	await page.waitForURL( '**/checkout/order-received/**', {
+		timeout: 20000,
+	} ); // Allow some extra time for the redirect to complete.
 
 	await expect( page.locator( 'h1.entry-title' ) ).toHaveText(
 		'Order received'

@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { payments } from '../../../utils';
+import { payments, config } from '../../../utils';
 
 const {
 	emptyCart,
@@ -40,7 +39,9 @@ test( 'customer can checkout with a SCA card @smoke', async ( { page } ) => {
 		.getByRole( 'button', { name: 'Complete' } )
 		.click();
 
-	await page.waitForURL( '**/checkout/order-received/**' );
+	await page.waitForURL( '**/checkout/order-received/**', {
+		timeout: 20000,
+	} );
 
 	await expect( page.locator( 'h1.entry-title' ) ).toHaveText(
 		'Order received'

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { payments, api, user } from '../../../utils';
+import { payments, api, config } from '../../../utils';
+import qit from '/qitHelpers';
 
 const {
 	setupShortcodeCheckout,
@@ -51,7 +51,7 @@ test( 'customer can renew a subscription @smoke @subscriptions', async ( {
 	page,
 } ) => {
 	await test.step( 'customer login', async () => {
-		await user.login(
+		await qit.loginAs(
 			page,
 			username,
 			config.get( 'users.customer.password' )

@@ -1,12 +1,9 @@
-'use strict';
-
-/* jshint node: true */
-
 import { expect, test as setup } from '@playwright/test';
+import qit from '/qitHelpers';
 
 setup( 'Disable legacy checkout experience', async ( { browser } ) => {
 	const adminContext = await browser.newContext( {
-		storageState: process.env.ADMINSTATE,
+		storageState: qit.getEnv( 'ADMINSTATE' ),
 	} );
 	const page = await adminContext.newPage();
 

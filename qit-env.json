@@ -1,0 +1,14 @@
+{
+	"php_version": "7.4",
+	"plugins": {
+		"woocommerce": {
+			"action": "bootstrap"
+		},
+		"woocommerce-subscriptions": {
+			"action": "bootstrap"
+		}
+	},
+	"themes": [
+		"storefront"
+	]
+}

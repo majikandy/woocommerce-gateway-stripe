@@ -1,14 +1,16 @@
 import wcApi from '@woocommerce/woocommerce-rest-api';
 import config from '../config/playwright.config';
 
+import qit from '/qitHelpers';
+
 let api;
 
 // Ensure that global-setup.js runs before creating api client
-if ( process.env.CONSUMER_KEY && process.env.CONSUMER_SECRET ) {
+if ( qit.getEnv( 'CONSUMER_KEY' ) && qit.getEnv( 'CONSUMER_SECRET' ) ) {
 	api = new wcApi( {
 		url: config.use.baseURL,
-		consumerKey: process.env.CONSUMER_KEY,
-		consumerSecret: process.env.CONSUMER_SECRET,
+		consumerKey: qit.getEnv( 'CONSUMER_KEY' ),
+		consumerSecret: qit.getEnv( 'CONSUMER_SECRET' ),
 		version: 'wc/v3',
 	} );
 }

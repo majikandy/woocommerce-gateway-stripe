@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { payments, api, user } from '../../../utils';
+import { payments, api, config } from '../../../utils';
+import qit from '/qitHelpers';
 
 const {
 	emptyCart,
@@ -29,7 +29,7 @@ test.beforeAll( async () => {
 
 test( 'customer can checkout with a saved card @smoke', async ( { page } ) => {
 	await test.step( 'customer login', async () => {
-		await user.login(
+		await qit.loginAs(
 			page,
 			username,
 			config.get( 'users.customer.password' )
@@ -50,7 +50,9 @@ test( 'customer can checkout with a saved card @smoke', async ( { page } ) => {
 
 		await page.locator( 'text=Place order' ).click();
 
-		await page.waitForNavigation();
+		await page.waitForURL( '**/checkout/order-received/**', {
+			timeout: 20000,
+		} ); // Allow some extra time for the redirect to complete.
 		await expect( page.locator( 'h1.entry-title' ) ).toHaveText(
 			'Order received'
 		);
@@ -70,7 +72,9 @@ test( 'customer can checkout with a saved card @smoke', async ( { page } ) => {
 
 		await page.locator( 'text=Place order' ).click();
 
-		await page.waitForNavigation();
+		await page.waitForURL( '**/checkout/order-received/**', {
+			timeout: 20000,
+		} ); // Allow some extra time for the redirect to complete.
 		await expect( page.locator( 'h1.entry-title' ) ).toHaveText(
 			'Order received'
 		);

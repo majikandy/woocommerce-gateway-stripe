@@ -1,7 +1,8 @@
 import stripe from 'stripe';
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { api, payments } from '../../utils';
+
+import qit from '/qitHelpers';
+import { api, payments, config } from '../../utils';
 
 const {
 	emptyCart,
@@ -14,7 +15,7 @@ test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
 	let orderId, stripeChargeId, stripeRefundId;
 
 	const adminContext = await browser.newContext( {
-		storageState: process.env.ADMINSTATE,
+		storageState: qit.getEnv( 'ADMINSTATE' ),
 	} );
 	const adminPage = await adminContext.newPage();
 
@@ -101,7 +102,7 @@ test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
 	);
 
 	await test.step( 'check Stripe payment status ', async () => {
-		const stripeClient = stripe( process.env.STRIPE_SECRET_KEY );
+		const stripeClient = stripe( qit.getEnv( 'STRIPE_SECRET_KEY' ) );
 
 		const charge = await stripeClient.charges.retrieve( stripeChargeId, {
 			expand: [ 'refunds' ],

@@ -1,12 +1,13 @@
 'use strict';
 
 /* jshint node: true */
+import qit from '/qitHelpers';
 
 import { expect, test as setup } from '@playwright/test';
 
 setup( 'Enable legacy checkout experience', async ( { browser } ) => {
 	const adminContext = await browser.newContext( {
-		storageState: process.env.ADMINSTATE,
+		storageState: qit.getEnv( 'ADMINSTATE' ),
 	} );
 	const page = await adminContext.newPage();
 

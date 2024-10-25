@@ -1,7 +1,7 @@
 import stripe from 'stripe';
 import { test, expect } from '@playwright/test';
-import config from 'config';
-import { api, payments } from '../../../utils';
+import { api, payments, config } from '../../../utils';
+import qit from '/qitHelpers';
 
 const {
 	emptyCart,
@@ -14,7 +14,7 @@ test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
 	let orderId, stripeChargeId, stripeRefundId;
 
 	const adminContext = await browser.newContext( {
-		storageState: process.env.ADMINSTATE,
+		storageState: qit.getEnv( 'ADMINSTATE' ),
 	} );
 	const adminPage = await adminContext.newPage();
 
@@ -34,7 +34,9 @@ test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
 			config.get( 'cards.basic' )
 		);
 		await userPage.locator( 'text=Place order' ).click();
-		await userPage.waitForNavigation();
+		await page.waitForURL( '**/checkout/order-received/**', {
+			timeout: 20000,
+		} ); // Allow some extra time for the redirect to complete.
 
 		await expect( userPage.locator( 'h1.entry-title' ) ).toHaveText(
 			'Order received'
@@ -101,7 +103,7 @@ test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
 	);
 
 	await test.step( 'check Stripe payment status ', async () => {
-		const stripeClient = stripe( process.env.STRIPE_SECRET_KEY );
+		const stripeClient = stripe( qit.getEnv( 'STRIPE_SECRET_KEY' ) );
 
 		const charge = await stripeClient.charges.retrieve( stripeChargeId, {
 			expand: [ 'refunds' ],
