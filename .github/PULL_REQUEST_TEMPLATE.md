@@ -58,14 +58,6 @@ Please follow the following guidelines when writing testing instructions:
 
 <summary>Changelog Entry Details</summary>
 
-#### Significance
-
-<!-- Choose only one -->
-
--   [ ] Patch
--   [ ] Minor
--   [ ] Major
-
 #### Type
 
 <!-- Choose only one -->
@@ -75,8 +67,6 @@ Please follow the following guidelines when writing testing instructions:
 -   [ ] Update - Update existing functionality
 -   [ ] Dev - Development related task
 -   [ ] Tweak - A minor adjustment to the codebase
--   [ ] Performance - Address performance issues
--   [ ] Enhancement - Improvement to existing functionality
 
 #### Message <!-- Add a changelog message here -->
 
