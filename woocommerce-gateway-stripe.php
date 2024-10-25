@@ -262,10 +262,10 @@ function woocommerce_gateway_stripe() {
 				require_once dirname( __FILE__ ) . '/includes/class-wc-stripe-account.php';
 				new Allowed_Payment_Request_Button_Types_Update();
 
-				$this->api                            = new WC_Stripe_Connect_API();
-				$this->connect                        = new WC_Stripe_Connect( $this->api );
-				$this->payment_request_configuration  = new WC_Stripe_Payment_Request();
-				$this->account                        = new WC_Stripe_Account( $this->connect, 'WC_Stripe_API' );
+				$this->api                           = new WC_Stripe_Connect_API();
+				$this->connect                       = new WC_Stripe_Connect( $this->api );
+				$this->payment_request_configuration = new WC_Stripe_Payment_Request();
+				$this->account                       = new WC_Stripe_Account( $this->connect, 'WC_Stripe_API' );
 
 				// Express checkout configurations.
 				$express_checkout_helper              = new WC_Stripe_Express_Checkout_Helper();
@@ -483,12 +483,12 @@ function woocommerce_gateway_stripe() {
 					}
 				}
 
-				// Don't mark Link as enabled if we're in the admin so it doesn't show up in the checkout editor page.
+				// Don't include Link as an enabled method if we're in the admin so it doesn't show up in the checkout editor page.
 				if ( is_admin() ) {
 					$methods = array_filter(
 						$methods,
 						function( $method ) {
-							return WC_Stripe_UPE_Payment_Method_Link::class !== $method;
+							return ! is_a( $method, WC_Stripe_UPE_Payment_Method_Link::class );
 						}
 					);
 				}
