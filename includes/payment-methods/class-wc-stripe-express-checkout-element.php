@@ -229,9 +229,12 @@ class WC_Stripe_Express_Checkout_Element {
 		$items    = [];
 
 		foreach ( $order->get_items() as $item ) {
+			$quantity       = $item->get_quantity();
+			$quantity_label = 1 < $quantity ? ' (x' . $quantity . ')' : '';
+
 			if ( method_exists( $item, 'get_total' ) ) {
 				$items[] = [
-					'label'  => $item->get_name(),
+					'label'  => $item->get_name() . $quantity_label,
 					'amount' => WC_Stripe_Helper::get_stripe_amount( $item->get_total(), $currency ),
 				];
 			}
