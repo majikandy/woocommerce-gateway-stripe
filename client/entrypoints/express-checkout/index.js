@@ -141,6 +141,7 @@ jQuery( function ( $ ) {
 				currency: options.currency,
 				paymentMethodCreation: 'manual',
 				appearance: getExpressCheckoutButtonAppearance(),
+				locale: getExpressCheckoutData( 'stripe' )?.locale ?? 'en',
 				paymentMethodTypes: getExpressPaymentMethodTypes(),
 			} );
 
@@ -285,6 +286,7 @@ jQuery( function ( $ ) {
 					currency: getExpressCheckoutData( 'checkout' )
 						.currency_code,
 					appearance: getExpressCheckoutButtonAppearance(),
+					locale: getExpressCheckoutData( 'stripe' )?.locale ?? 'en',
 					displayItems,
 					order,
 				} );
