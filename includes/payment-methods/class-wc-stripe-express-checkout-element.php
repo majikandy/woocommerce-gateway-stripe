@@ -228,15 +228,23 @@ class WC_Stripe_Express_Checkout_Element {
 		$data     = [];
 		$items    = [];
 
-		foreach ( $order->get_items() as $item ) {
-			$quantity       = $item->get_quantity();
-			$quantity_label = 1 < $quantity ? ' (x' . $quantity . ')' : '';
+		// Allow third-party plugins to show itemization on the payment request button.
+		if ( apply_filters( 'wc_stripe_payment_request_hide_itemization', false ) ) {
+			$items[] = [
+				'label'  => __( 'Subtotal', 'woocommerce-gateway-stripe' ),
+				'amount' => WC_Stripe_Helper::get_stripe_amount( $order->get_subtotal(), $currency ),
+			];
+		} else {
+			foreach ( $order->get_items() as $item ) {
+				$quantity       = $item->get_quantity();
+				$quantity_label = 1 < $quantity ? ' (x' . $quantity . ')' : '';
 
-			if ( method_exists( $item, 'get_total' ) ) {
-				$items[] = [
-					'label'  => $item->get_name() . $quantity_label,
-					'amount' => WC_Stripe_Helper::get_stripe_amount( $item->get_total(), $currency ),
-				];
+				if ( method_exists( $item, 'get_total' ) ) {
+					$items[] = [
+						'label'  => $item->get_name() . $quantity_label,
+						'amount' => WC_Stripe_Helper::get_stripe_amount( $item->get_total(), $currency ),
+					];
+				}
 			}
 		}
 
