@@ -464,9 +464,12 @@ jQuery( function ( $ ) {
 		 *
 		 * @param {PaymentResponse} payment Payment response instance.
 		 * @param {string} message Error message to display.
+		 * @param {boolean} isOrderError Whether the error is related to the order creation.
 		 */
-		abortPayment: ( payment, message ) => {
-			payment.paymentFailed( { reason: 'fail' } );
+		abortPayment: ( payment, message, isOrderError = false ) => {
+			if ( ! isOrderError ) {
+				payment.paymentFailed( { reason: 'fail' } );
+			}
 			onAbortPaymentHandler( payment, message );
 
 			$( '.woocommerce-error' ).remove();
