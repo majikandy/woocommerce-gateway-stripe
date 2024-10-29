@@ -4,7 +4,7 @@ Tags: credit card, stripe, apple pay, payment request, google pay, sepa, bancont
 Requires at least: 6.4
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 8.8.0
+Stable tag: 8.8.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Attributions: thorsten-stripe
@@ -111,14 +111,14 @@ If you get stuck, you can ask for help in the [Plugin Forum](https://wordpress.o
 == Changelog ==
 
 = 8.9.0 - xxxx-xx-xx =
+* Tweak - Makes the new Stripe Express Checkout Element enabled by default.
 * Dev - Add multiple unit tests for the Stripe Express Checkout Element implementation (for both frontend and backend).
-* Tweak - Disables APMs when using the legacy checkout experience due Stripe deprecation by October 29, 2024.
 * Fix - Corrected card brand capitalization on the My Account → Subscription page.
 * Fix - Displays a specific message when an authentication error occurs during checkout for 3DS cards (shortcode version).
 * Fix - Show 'Use a New Payment Method' radio button for logged in users only when card saving is enabled.
 * Fix - Fix the display and usage of the Link payment method on the shortcode checkout page with the Stripe Express Checkout Element.
-* Fix - Prevent marking orders on-hold with order note "Process order to take payment" when the payment has failed.
 * Fix - Fix payment methods count on settings page.
+* Update - Improve Express Payment button previews on the edit Block Checkout and Cart pages for Google Pay and Apple Pay.
 * Tweak - Add error logging in ECE critical Ajax requests.
 * Add - Add support for Stripe Link payments via the new Stripe Checkout Element on the block cart and block checkout pages.
 * Add - Add support for Stripe Link payments via the new Stripe Checkout Element on the product, cart, checkout and pay for order pages.
