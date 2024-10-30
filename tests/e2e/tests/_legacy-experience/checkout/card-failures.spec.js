@@ -44,7 +44,7 @@ const testCardBlocks = async ( page, cardKey ) => {
 };
 
 test.describe.configure( { mode: 'parallel' } );
-test.describe( 'customer cannot checkout with invalid cards', () => {
+test.describe( 'customer cannot checkout with invalid cards @legacy', () => {
 	test( `a declined card shows the correct error message @smoke`, async ( {
 		page,
 	} ) => testCard( page, 'cards.declined' ) );

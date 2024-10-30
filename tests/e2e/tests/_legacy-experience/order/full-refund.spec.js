@@ -10,7 +10,9 @@ const {
 	fillCreditCardDetailsShortcodeLegacy,
 } = payments;
 
-test( 'merchant can issue a full refund @smoke', async ( { browser } ) => {
+test( 'merchant can issue a full refund @smoke @legacy', async ( {
+	browser,
+} ) => {
 	let orderId, stripeChargeId, stripeRefundId;
 
 	const adminContext = await browser.newContext( {

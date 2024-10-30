@@ -8,7 +8,7 @@ const {
 	fillCreditCardDetailsShortcodeLegacy,
 } = payments;
 
-test( 'customer can checkout with a normal credit card @smoke', async ( {
+test( 'customer can checkout with a normal credit card @smoke @legacy', async ( {
 	page,
 } ) => {
 	await emptyCart( page );

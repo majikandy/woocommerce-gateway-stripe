@@ -8,7 +8,7 @@ const {
 	setupBlocksCheckout,
 } = payments;
 
-test( 'customer can checkout with a normal credit card @smoke @blocks', async ( {
+test( 'customer can checkout with a normal credit card @smoke @blocks @legacy', async ( {
 	page,
 } ) => {
 	await emptyCart( page );

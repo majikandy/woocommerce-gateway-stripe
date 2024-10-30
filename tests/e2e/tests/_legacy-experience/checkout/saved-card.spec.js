@@ -27,7 +27,9 @@ test.beforeAll( async () => {
 	await api.create.customer( user );
 } );
 
-test( 'customer can checkout with a saved card @smoke', async ( { page } ) => {
+test( 'customer can checkout with a saved card @smoke @legacy', async ( {
+	page,
+} ) => {
 	await test.step( 'customer login', async () => {
 		await qit.loginAs(
 			page,

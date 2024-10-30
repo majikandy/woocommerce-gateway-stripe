@@ -8,7 +8,9 @@ const {
 	fillCreditCardDetailsShortcodeLegacy,
 } = payments;
 
-test( 'customer can checkout with a SCA card @smoke', async ( { page } ) => {
+test( 'customer can checkout with a SCA card @smoke @legacy', async ( {
+	page,
+} ) => {
 	test.slow(); // Make sure test has enough time to complete.
 
 	await emptyCart( page );

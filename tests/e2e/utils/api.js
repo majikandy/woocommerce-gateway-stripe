@@ -1,8 +1,7 @@
 import wcApi from '@woocommerce/woocommerce-rest-api';
-import config from '../config/playwright.config';
-
 import qit from '/qitHelpers';
 
+const config = require( '/qit/tests/e2e/qit-playwright.config' );
 let api;
 
 // Ensure that global-setup.js runs before creating api client

@@ -8,7 +8,7 @@ const {
 	fillCreditCardDetailsLegacy,
 } = payments;
 
-test( 'customer can checkout with a SCA card @smoke @blocks', async ( {
+test( 'customer can checkout with a SCA card @smoke @blocks @legacy', async ( {
 	page,
 } ) => {
 	await emptyCart( page );

@@ -5,7 +5,7 @@ import qit from '/qitHelpers';
 
 import { expect, test as setup } from '@playwright/test';
 
-setup( 'Enable legacy checkout experience', async ( { browser } ) => {
+setup( 'Enable legacy checkout experience @legacy', async ( { browser } ) => {
 	const adminContext = await browser.newContext( {
 		storageState: qit.getEnv( 'ADMINSTATE' ),
 	} );

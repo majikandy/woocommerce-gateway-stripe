@@ -47,7 +47,7 @@ test.afterAll( async () => {
 	await api.deletePost.product( productId );
 } );
 
-test( 'customer can renew a subscription @smoke @subscriptions', async ( {
+test( 'customer can renew a subscription @smoke @subscriptions @legacy', async ( {
 	page,
 } ) => {
 	await test.step( 'customer login', async () => {

@@ -31,7 +31,7 @@ test.afterAll( async () => {
 	await api.deletePost.product( productId );
 } );
 
-test( 'customer can purchase a subscription product @smoke @subscriptions', async ( {
+test( 'customer can purchase a subscription product @smoke @subscriptions @legacy', async ( {
 	page,
 } ) => {
 	await page.goto( `?p=${ productId }` );
