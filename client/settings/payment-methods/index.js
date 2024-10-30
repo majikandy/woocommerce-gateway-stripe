@@ -52,6 +52,7 @@ const PaymentMethodsPanel = ( { onSaveChanges } ) => {
 	const [ showPromotionalBanner, setShowPromotionalBanner ] = useState(
 		true
 	);
+	const [ promotionalBannerType, setPromotionalBannerType ] = useState( '' );
 	const { isUpeEnabled, setIsUpeEnabled } = useContext( UpeToggleContext );
 	const { data } = useAccount();
 	const isTestModeEnabled = Boolean( data.testmode );
@@ -65,6 +66,7 @@ const PaymentMethodsPanel = ( { onSaveChanges } ) => {
 				<SettingsSection>
 					<PromotionalBannerSection
 						setShowPromotionalBanner={ setShowPromotionalBanner }
+						setPromotionalBannerType={ setPromotionalBannerType }
 						isUpeEnabled={ isUpeEnabled }
 						setIsUpeEnabled={ setIsUpeEnabled }
 						isConnectedViaOAuth={ oauthConnected }
@@ -81,7 +83,12 @@ const PaymentMethodsPanel = ( { onSaveChanges } ) => {
 			) }
 			<SettingsSection Description={ PaymentMethodsDescription }>
 				<DisplayOrderCustomizationNotice />
-				<GeneralSettingsSection onSaveChanges={ onSaveChanges } />
+				<GeneralSettingsSection
+					onSaveChanges={ onSaveChanges }
+					showLegacyExperienceTransitionNotice={
+						promotionalBannerType !== 'new-checkout-experience'
+					}
+				/>
 			</SettingsSection>
 			<SettingsSection Description={ PaymentRequestDescription }>
 				<LoadableSettingsSection numLines={ 20 }>

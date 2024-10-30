@@ -58,6 +58,7 @@ const DismissButton = styled( Button )`
 
 const PromotionalBannerSection = ( {
 	setShowPromotionalBanner,
+	setPromotionalBannerType,
 	isUpeEnabled,
 	setIsUpeEnabled,
 	isConnectedViaOAuth,
@@ -288,11 +289,14 @@ const PromotionalBannerSection = ( {
 
 	let BannerContent = null;
 	if ( isConnectedViaOAuth === false ) {
+		setPromotionalBannerType( 'stripe-reconnect' );
 		BannerContent = <ReConnectAccountBanner />;
 	} else if ( ! isUpeEnabled ) {
 		if ( hasAPMEnabled ) {
+			setPromotionalBannerType( 'new-checkout-experience' );
 			BannerContent = <NewCheckoutExperienceAPMsBanner />;
 		} else {
+			setPromotionalBannerType( 'new-checkout-experience' );
 			BannerContent = <NewCheckoutExperienceBanner />;
 		}
 	}
