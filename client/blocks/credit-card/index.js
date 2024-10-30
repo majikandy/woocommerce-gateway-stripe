@@ -58,6 +58,7 @@ const stripeCcPaymentMethod = {
 		showSavedCards: getBlocksConfiguration()?.showSavedCards ?? false,
 		showSaveOption: getBlocksConfiguration()?.showSaveOption ?? false,
 		features: getBlocksConfiguration()?.supports ?? [],
+		style: getBlocksConfiguration()?.style ?? [],
 	},
 };
 

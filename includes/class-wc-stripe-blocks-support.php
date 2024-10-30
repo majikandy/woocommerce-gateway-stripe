@@ -197,6 +197,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 				'button'                         => [
 					'customLabel' => $this->payment_request_configuration->get_button_label(),
 				],
+				'style'                          => $this->get_style(),
 			]
 		);
 	}
@@ -247,6 +248,18 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 		}
 
 		return $this->payment_request_configuration->should_show_payment_request_button();
+	}
+
+	/**
+	 * Returns an array of style properties supported by the payment method.
+	 *
+	 * @return array Array of style properties.
+	 */
+	private function get_style() {
+		return [
+			'height',
+			'borderRadius',
+		];
 	}
 
 	/**

@@ -65,6 +65,7 @@ const paymentRequestPaymentMethod = {
 	paymentMethodId: 'stripe',
 	supports: {
 		features: getBlocksConfiguration()?.supports ?? [],
+		style: getBlocksConfiguration()?.style ?? [],
 	},
 };
 

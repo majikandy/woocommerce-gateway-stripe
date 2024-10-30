@@ -90,6 +90,7 @@ Object.entries( paymentMethodsConfig )
 					getBlocksConfiguration()?.showSavedCards ?? false,
 				showSaveOption: upeConfig.showSaveOption ?? false,
 				features: getBlocksConfiguration()?.supports ?? [],
+				style: getBlocksConfiguration()?.style ?? [],
 			},
 		} );
 	} );

@@ -38,6 +38,7 @@ const expressCheckoutElementsGooglePay = ( api ) => ( {
 	gatewayId: 'stripe',
 	supports: {
 		features: getBlocksConfiguration()?.supports ?? [],
+		style: getBlocksConfiguration()?.style ?? [],
 	},
 } );
 
@@ -66,6 +67,7 @@ const expressCheckoutElementsApplePay = ( api ) => ( {
 	gatewayId: 'stripe',
 	supports: {
 		features: getBlocksConfiguration()?.supports ?? [],
+		style: getBlocksConfiguration()?.style ?? [],
 	},
 } );
 
@@ -92,6 +94,7 @@ const expressCheckoutElementsStripeLink = ( api ) => ( {
 	paymentMethodId: PAYMENT_METHOD_EXPRESS_CHECKOUT_ELEMENT,
 	supports: {
 		features: getBlocksConfiguration()?.supports ?? [],
+		style: getBlocksConfiguration()?.style ?? [],
 	},
 } );
 
