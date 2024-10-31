@@ -252,6 +252,7 @@ final class WC_Stripe_Blocks_Support extends AbstractPaymentMethodType {
 
 	/**
 	 * Returns an array of style properties supported by the payment method.
+	 * This method is used only when rendering the payment method in the editor.
 	 *
 	 * @return array Array of style properties.
 	 */
