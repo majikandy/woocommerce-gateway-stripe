@@ -895,7 +895,7 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 	/**
 	 * Handles the processing of a payment intent webhook.
 	 *
-	 * @param stdObject $notification The webhook notification from Stripe.
+	 * @param stdClass $notification The webhook notification from Stripe.
 	 */
 	public function process_payment_intent_success( $notification ) {
 		$intent = $notification->data->object;
@@ -1211,7 +1211,6 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 	 * @return WC_Order|false The order object, or false if not found.
 	 */
 	private function get_order_from_intent( $intent ) {
-
 		// Attempt to get the order from the intent metadata.
 		if ( isset( $intent->metadata->signature ) ) {
 			$signature = wc_clean( $intent->metadata->signature );
@@ -1228,7 +1227,10 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 					return $order;
 				}
 
-				// If the order has no intent ID set, use the signature to verify the order.
+				/**
+				 * If the order has no intent ID stored, we may have failed to store it during the checkout process.
+				 * Confirm that the signature matches the order otherwise fallback to finding the order via the intent ID.
+				 */
 				if ( empty( $intent_id ) && $this->get_order_signature( $order ) === $signature ) {
 					return $order;
 				}
