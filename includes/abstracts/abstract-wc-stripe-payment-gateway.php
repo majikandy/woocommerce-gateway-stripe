@@ -2316,4 +2316,16 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 
 		return $balance_transaction_id;
 	}
+
+	/**
+	 * Generates a unique signature for an order.
+	 *
+	 * This signature is passed in meta data to Stripe and used to identify the order when webhooks are received.
+	 *
+	 * @param WC_Order $order Order object.
+	 * @return string The order's unique signature.
+	 */
+	protected function get_order_signature( $order ) {
+		return sprintf( '%d:%s', $order->get_id(), md5( $order->get_order_key() . $order->get_id() . $order->get_customer_id() ) );
+	}
 }
