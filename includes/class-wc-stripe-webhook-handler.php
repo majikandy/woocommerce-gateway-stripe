@@ -1228,8 +1228,8 @@ class WC_Stripe_Webhook_Handler extends WC_Stripe_Payment_Gateway {
 				}
 
 				/**
-				 * If the order has no intent ID stored, we may have failed to store it during the checkout process.
-				 * Confirm that the signature matches the order otherwise fallback to finding the order via the intent ID.
+				 * If the order has no intent ID stored, we may have failed to store it during the initial payment request.
+				 * Confirm that the signature matches the order, otherwise fall back to finding the order via the intent ID.
 				 */
 				if ( empty( $intent_id ) && $this->get_order_signature( $order ) === $signature ) {
 					return $order;
