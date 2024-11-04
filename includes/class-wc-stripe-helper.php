@@ -1492,16 +1492,6 @@ class WC_Stripe_Helper {
 	}
 
 	/**
-	 * Verifies if the provided order contains the identifier for a wallet method.
-	 *
-	 * @param WC_Order $order The order.
-	 * @return bool
-	 */
-	public static function is_wallet_payment_method( $order ) {
-		return in_array( $order->get_meta( '_stripe_upe_payment_type' ), WC_Stripe_Payment_Methods::WALLET_PAYMENT_METHODS, true );
-	}
-
-	/**
 	 * Checks if a given URL matches the current site's Webhook URL.
 	 *
 	 * This function ignores trailing slashes and compares the host and path of the URLs.
