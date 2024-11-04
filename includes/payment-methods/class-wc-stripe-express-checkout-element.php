@@ -171,7 +171,7 @@ class WC_Stripe_Express_Checkout_Element {
 		return [
 			'ajax_url'           => WC_AJAX::get_endpoint( '%%endpoint%%' ),
 			'stripe'             => [
-				'publishable_key'             => 'yes' === $this->stripe_settings['testmode'] ? $this->stripe_settings['test_publishable_key'] : $this->stripe_settings['publishable_key'],
+				'publishable_key'             => WC_Stripe_Mode::is_test() ? $this->stripe_settings['test_publishable_key'] : $this->stripe_settings['publishable_key'],
 				'allow_prepaid_card'          => apply_filters( 'wc_stripe_allow_prepaid_card', true ) ? 'yes' : 'no',
 				'locale'                      => WC_Stripe_Helper::convert_wc_locale_to_stripe_locale( get_locale() ),
 				'is_link_enabled'             => WC_Stripe_UPE_Payment_Method_Link::is_link_enabled(),
