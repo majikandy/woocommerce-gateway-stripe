@@ -441,7 +441,7 @@ class WC_Stripe_Payment_Tokens {
 					$stripe_customer->set_default_payment_method( $token->get_token() );
 				}
 			} else {
-				if ( 'stripe' === $token->get_gateway_id() || 'stripe_sepa' === $token->get_gateway_id() ) {
+				if ( WC_Gateway_Stripe::ID === $token->get_gateway_id() || WC_Gateway_Stripe_Sepa::ID === $token->get_gateway_id() ) {
 					$stripe_customer->set_default_source( $token->get_token() );
 				}
 			}
