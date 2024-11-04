@@ -1674,10 +1674,10 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	public function lock_order_payment( $order, $intent = null ) {
 		$order->read_meta_data( true );
 
-		$existing_lock = $order->get_meta( '_stripe_lock_payment', true ); // In the format of a {expiry_timestamp}|{pi_xxxx}
+		$existing_lock = $order->get_meta( '_stripe_lock_payment', true );
 
 		if ( $existing_lock ) {
-			$parts         = explode( '|', $existing_lock );
+			$parts         = explode( '|', $existing_lock ); // This meta is stored the format {expiry_timestamp}|{pi_xxxx} or {expiry_timestamp} if no intent is passed.
 			$expiration    = (int) $parts[0];
 			$locked_intent = ! empty( $parts[1] ) ? $parts[1] : '';
 
