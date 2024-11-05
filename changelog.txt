@@ -1332,7 +1332,7 @@
 * Add support for changing a subscription's recurring amount
 
 = 1.5.0 - 2013-01-18 =
-* Supports Stripe Checkout https://stripe.com/docs/checkout
+* Supports Stripe Checkout https://docs.stripe.com/payments/checkout
 
 = 1.4.0 - 2013-01-18 =
 * WC 2.0 Compat
