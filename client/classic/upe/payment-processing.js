@@ -265,7 +265,17 @@ export const processPayment = (
 		} catch ( err ) {
 			hasCheckoutCompleted = false;
 			jQueryForm.removeClass( 'processing' ).unblock();
-			showErrorCheckout( err.message );
+
+			let errorMessage = err.message;
+			if ( err.code === 'parameter_invalid_empty' ) {
+				const param = err.param.match( /country|postalCode/ );
+				if ( param ) {
+					errorMessage = `Missing required billing address field: ${ param[ 0 ] }.`;
+				} else {
+					errorMessage = 'Missing required billing address field.';
+				}
+			}
+			showErrorCheckout( errorMessage );
 		}
 	} )();
 
