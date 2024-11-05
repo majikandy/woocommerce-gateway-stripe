@@ -1,7 +1,7 @@
 /* global wc_stripe_settings_params */
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { React } from 'react';
+import { React, useEffect } from 'react';
 import { Card, Button, ExternalLink } from '@wordpress/components';
 import styled from '@emotion/styled';
 import interpolateComponents from 'interpolate-components';
@@ -73,6 +73,14 @@ const PromotionalBannerSection = ( {
 	const [ enabledPaymentMethodIds ] = useEnabledPaymentMethodIds();
 	const hasAPMEnabled =
 		enabledPaymentMethodIds.filter( ( e ) => e !== 'card' ).length > 0;
+
+	useEffect( () => {
+		if ( isConnectedViaOAuth === false ) {
+			setPromotionalBannerType( RECONNECT_BANNER );
+		} else if ( ! isUpeEnabled ) {
+			setPromotionalBannerType( NEW_CHECKOUT_EXPERIENCE_BANNER );
+		}
+	}, [ isUpeEnabled, isConnectedViaOAuth, setPromotionalBannerType ] );
 
 	const handleButtonClick = () => {
 		const callback = async () => {
@@ -290,14 +298,11 @@ const PromotionalBannerSection = ( {
 
 	let BannerContent = null;
 	if ( isConnectedViaOAuth === false ) {
-		setPromotionalBannerType?.( RECONNECT_BANNER );
 		BannerContent = <ReConnectAccountBanner />;
 	} else if ( ! isUpeEnabled ) {
 		if ( hasAPMEnabled ) {
-			setPromotionalBannerType?.( NEW_CHECKOUT_EXPERIENCE_BANNER );
 			BannerContent = <NewCheckoutExperienceAPMsBanner />;
 		} else {
-			setPromotionalBannerType?.( NEW_CHECKOUT_EXPERIENCE_BANNER );
 			BannerContent = <NewCheckoutExperienceBanner />;
 		}
 	}
