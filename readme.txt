@@ -128,5 +128,6 @@ If you get stuck, you can ask for help in the [Plugin Forum](https://wordpress.o
 * Add - Add support for Stripe Link payments via the new Stripe Checkout Element on the product, cart, checkout and pay for order pages.
 * Add - Show ECE button preview on settings page.
 * Tweak - Remove the subscription order notes added each time a source wasn't migrated.
+* Tweak - Update links to plugin documentation and Stripe documentation.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce-gateway-stripe/trunk/changelog.txt).
