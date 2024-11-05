@@ -1,12 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import styled from '@emotion/styled';
+import interpolateComponents from 'interpolate-components';
 import React, { useContext, useState } from 'react';
 import { CheckboxControl, Button } from '@wordpress/components';
 import { Icon, info } from '@wordpress/icons';
 import { useManualCapture } from 'wcstripe/data';
 import ConfirmationModal from 'wcstripe/components/confirmation-modal';
 import UpeToggleContext from 'wcstripe/settings/upe-toggle/context';
-import interpolateComponents from 'interpolate-components';
 
 const AlertIcon = styled( Icon )`
 	fill: #afafaf;
