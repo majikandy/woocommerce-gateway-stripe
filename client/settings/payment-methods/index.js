@@ -7,6 +7,7 @@ import PaymentRequestSection from '../payment-request-section';
 import GeneralSettingsSection from '../general-settings-section';
 import LoadableSettingsSection from '../loadable-settings-section';
 import DisplayOrderCustomizationNotice from '../display-order-customization-notice';
+import { NEW_CHECKOUT_EXPERIENCE_BANNER } from 'wcstripe/settings/payment-settings/constants';
 import PromotionalBannerSection from 'wcstripe/settings/payment-settings/promotional-banner-section';
 import UpeToggleContext from 'wcstripe/settings/upe-toggle/context';
 import { useAccount } from 'wcstripe/data/account';
@@ -86,7 +87,7 @@ const PaymentMethodsPanel = ( { onSaveChanges } ) => {
 				<GeneralSettingsSection
 					onSaveChanges={ onSaveChanges }
 					showLegacyExperienceTransitionNotice={
-						promotionalBannerType !== 'new-checkout-experience'
+						promotionalBannerType !== NEW_CHECKOUT_EXPERIENCE_BANNER
 					}
 				/>
 			</SettingsSection>

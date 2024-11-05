@@ -8,6 +8,7 @@ import interpolateComponents from 'interpolate-components';
 import CardBody from '../card-body';
 import bannerIllustration from './banner-illustration.svg';
 import bannerIllustrationReConnect from './banner-illustration-re-connect.svg';
+import { RECONNECT_BANNER, NEW_CHECKOUT_EXPERIENCE_BANNER } from './constants';
 import Pill from 'wcstripe/components/pill';
 import { recordEvent } from 'wcstripe/tracking';
 import { useEnabledPaymentMethodIds, useTestMode } from 'wcstripe/data';
@@ -289,14 +290,14 @@ const PromotionalBannerSection = ( {
 
 	let BannerContent = null;
 	if ( isConnectedViaOAuth === false ) {
-		setPromotionalBannerType( 'stripe-reconnect' );
+		setPromotionalBannerType?.( RECONNECT_BANNER );
 		BannerContent = <ReConnectAccountBanner />;
 	} else if ( ! isUpeEnabled ) {
 		if ( hasAPMEnabled ) {
-			setPromotionalBannerType( 'new-checkout-experience' );
+			setPromotionalBannerType?.( NEW_CHECKOUT_EXPERIENCE_BANNER );
 			BannerContent = <NewCheckoutExperienceAPMsBanner />;
 		} else {
-			setPromotionalBannerType( 'new-checkout-experience' );
+			setPromotionalBannerType?.( NEW_CHECKOUT_EXPERIENCE_BANNER );
 			BannerContent = <NewCheckoutExperienceBanner />;
 		}
 	}
