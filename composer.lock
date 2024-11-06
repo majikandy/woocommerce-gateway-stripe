@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0a9df8031a76c0853743f49c2147a18",
+    "content-hash": "3935eb992b100f5ece69d9ff892483f1",
     "packages": [],
     "packages-dev": [
         {
@@ -4689,16 +4689,16 @@
         },
         {
             "name": "woocommerce/qit-cli",
-            "version": "0.7.0",
+            "version": "0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/woocommerce/qit-cli.git",
-                "reference": "0ba0ca3b065c7465566466ba242f17476aa6ab44"
+                "reference": "124a4fc100d0eb1486622ab3e2ffb24c31f5ba9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/woocommerce/qit-cli/zipball/0ba0ca3b065c7465566466ba242f17476aa6ab44",
-                "reference": "0ba0ca3b065c7465566466ba242f17476aa6ab44",
+                "url": "https://api.github.com/repos/woocommerce/qit-cli/zipball/124a4fc100d0eb1486622ab3e2ffb24c31f5ba9b",
+                "reference": "124a4fc100d0eb1486622ab3e2ffb24c31f5ba9b",
                 "shasum": ""
             },
             "require": {
@@ -4716,9 +4716,9 @@
             "description": "A command line interface for WooCommerce Quality Insights Toolkit (QIT).",
             "support": {
                 "issues": "https://github.com/woocommerce/qit-cli/issues",
-                "source": "https://github.com/woocommerce/qit-cli/tree/0.7.0"
+                "source": "https://github.com/woocommerce/qit-cli/tree/0.7.1"
             },
-            "time": "2024-10-22T15:08:18+00:00"
+            "time": "2024-10-30T21:07:50+00:00"
         },
         {
             "name": "woocommerce/woocommerce-sniffs",
