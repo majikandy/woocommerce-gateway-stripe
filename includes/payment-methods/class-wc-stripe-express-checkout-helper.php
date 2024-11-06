@@ -320,6 +320,27 @@ class WC_Stripe_Express_Checkout_Helper {
 		if ( 'GB' === $country ) {
 			// Replaces a redacted string with something like LN10***.
 			return str_pad( preg_replace( '/\s+/', '', $postcode ), 7, '*' );
+			// UK Postcodes returned from Apple Pay can be alpha numeric 2 chars, 3 chars, or 4 chars long will optionally have a trailing space, 
+			// depending on whether the customer put a space in their postcode between the outcode and incode part. 
+			// See https://assets.publishing.service.gov.uk/media/5a7b997d40f0b62826a049e0/ILRSpecification2013_14Appendix_C_Dec2012_v1.pdf for more details.
+
+			// Here is a table showing the functionality by example:
+			//  Original  | Apple Pay |  Normalized
+			// 'LN10 1AA' |  'LN10 '  |  'LN10 ***'
+			// 'LN101AA'  |  'LN10'   |  'LN10 ***'
+			// 'W10 2AA'  |  'W10 '   |  'W10 ***'
+			// 'W102AA'   |  'W10'    |  'W10 ***'
+			// 'N2 3AA    |  'N2 '    |  'N2 ***'
+			// 'N23AA     |  'N2'     |  'N2 ***'
+
+			$spaceless_postcode = preg_replace( '/\s+/', '', $postcode );
+
+			if ( strlen($spaceless_postcode) < 5) { 
+				// Always reintroduce the space so that Shipping Zones regex like 'N1 *' work to match N1 postcodes like N1 1AA, but don't match N10 postcodes like N10 1AA
+				return $spaceless_postcode . " ***"; 
+			} else {
+				return $postcode; // 5 or more chars means it probably wasn't redacted and will likely validate unchanged.
+			}
 		}
 		if ( 'CA' === $country ) {
 			// Replaces a redacted string with something like L4Y***.
