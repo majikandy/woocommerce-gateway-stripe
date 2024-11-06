@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source "${QIT_TEST_DIR}/config/local.env"
-
 wp rewrite structure '/%postname%/'
 wp theme activate storefront
 wp wc --user=admin tool run install_pages

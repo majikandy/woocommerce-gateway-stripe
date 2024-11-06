@@ -1,11 +1,6 @@
-import * as dotenv from 'dotenv';
-import { console } from 'inspector';
-const { test, chromium, expect } = require( '@playwright/test' );
+const { test, chromium } = require( '@playwright/test' );
 const fs = require( 'fs' );
-const path = require( 'path' );
 const qit = require( '/qitHelpers' );
-
-dotenv.config( { path: path.resolve( __dirname, '../config/local.env' ) } );
 
 /**
  * Setup the test environment
@@ -14,7 +9,6 @@ dotenv.config( { path: path.resolve( __dirname, '../config/local.env' ) } );
  */
 async function setup() {
 	const commands = [
-		'plugin install wordpress-importer --activate',
 		'plugin install disable-emails --activate',
 		'option set woocommerce_store_address "60 29th Street"',
 		'option set woocommerce_store_address_2 "#343"',

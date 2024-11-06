@@ -74,15 +74,14 @@ jobs:
           npm run build
 
       # E2E test environment
-      - name: Fill in local.env
-        working-directory: tests/e2e/config
+      - name: Fill in .env
         run: |
-          echo 'STRIPE_PUB_KEY="${{ secrets.E2E_STRIPE_PUBLISHABLE_KEY }}"' >> local.env
-          echo 'STRIPE_SECRET_KEY="${{ secrets.E2E_STRIPE_SECRET_KEY }}"' >> local.env
+          echo 'STRIPE_PUB_KEY="${{ secrets.E2E_STRIPE_PUBLISHABLE_KEY }}"' >> .env
+          echo 'STRIPE_SECRET_KEY="${{ secrets.E2E_STRIPE_SECRET_KEY }}"' >> .env
 
       - name: Run ${{ matrix.checkout }} E2E tests
         shell: bash
-        run: npm run test:e2e${{ matrix.checkout == 'Legacy' && '-legacy' || '' }}
+        run: npm run test:e2e${{ matrix.checkout == 'Legacy' && '-legacy' || '' }} -- --env_file .env
       
       - name: Upload ${{ matrix.checkout }} E2E test results
         if: ${{ failure() }}

@@ -1,6 +1,5 @@
 [
   "config",
   "@woocommerce/woocommerce-rest-api",
-  "dotenv",
   "stripe"
 ]
