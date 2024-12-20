@@ -4,6 +4,10 @@ import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import PromotionalBannerSection from '../promotional-banner-section';
 import { useEnabledPaymentMethodIds } from 'wcstripe/data';
+import {
+	PAYMENT_METHOD_CARD,
+	PAYMENT_METHOD_IDEAL,
+} from 'wcstripe/stripe-utils/constants';
 
 jest.mock( '@wordpress/data' );
 
@@ -30,6 +34,7 @@ useDispatch.mockImplementation( ( storeName ) => {
 } );
 
 const setShowPromotionalBanner = jest.fn();
+const setPromotionalBannerType = jest.fn();
 
 describe( 'PromotionalBanner', () => {
 	beforeEach( () => {
@@ -40,6 +45,7 @@ describe( 'PromotionalBanner', () => {
 		render(
 			<PromotionalBannerSection
 				setShowPromotionalBanner={ setShowPromotionalBanner }
+				setPromotionalBannerType={ setPromotionalBannerType }
 				isConnectedViaOAuth={ true }
 			/>
 		);
@@ -57,6 +63,7 @@ describe( 'PromotionalBanner', () => {
 		render(
 			<PromotionalBannerSection
 				setShowPromotionalBanner={ setShowPromotionalBanner }
+				setPromotionalBannerType={ setPromotionalBannerType }
 				isUpeEnabled={ false }
 				setIsUpeEnabled={ setIsUpeEnabledMock }
 				isConnectedViaOAuth={ true }
@@ -71,6 +78,7 @@ describe( 'PromotionalBanner', () => {
 		render(
 			<PromotionalBannerSection
 				setShowPromotionalBanner={ setShowPromotionalBanner }
+				setPromotionalBannerType={ setPromotionalBannerType }
 				isConnectedViaOAuth={ false }
 			/>
 		);
@@ -80,11 +88,14 @@ describe( 'PromotionalBanner', () => {
 	} );
 
 	it( 'Display the APM version of the new checkout experience promotional surface when any APM is enabled', () => {
-		useEnabledPaymentMethodIds.mockReturnValue( [ [ 'card', 'ideal' ] ] );
+		useEnabledPaymentMethodIds.mockReturnValue( [
+			[ PAYMENT_METHOD_CARD, PAYMENT_METHOD_IDEAL ],
+		] );
 
 		render(
 			<PromotionalBannerSection
 				setShowPromotionalBanner={ setShowPromotionalBanner }
+				setPromotionalBannerType={ setPromotionalBannerType }
 				isConnectedViaOAuth={ true }
 			/>
 		);

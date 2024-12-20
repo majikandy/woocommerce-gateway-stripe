@@ -1,10 +1,10 @@
 === WooCommerce Stripe Payment Gateway ===
 Contributors: woocommerce, automattic, royho, akeda, mattyza, bor0, woothemes
 Tags: credit card, stripe, apple pay, payment request, google pay, sepa, bancontact, alipay, giropay, ideal, p24, woocommerce, automattic
-Requires at least: 6.4
-Tested up to: 6.6
+Requires at least: 6.5
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 8.8.1
+Stable tag: 9.0.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Attributions: thorsten-stripe
@@ -110,24 +110,21 @@ If you get stuck, you can ask for help in the [Plugin Forum](https://wordpress.o
 
 == Changelog ==
 
-= 8.9.0 - xxxx-xx-xx =
-* Fix - Fix issues when detaching payment methods on staging sites (with the new checkout experience enabled).
-* Fix - Display a notice if taxes vary by customer's billing address when checking out using the Stripe Express Checkout Element.
-* Tweak - Makes the new Stripe Express Checkout Element enabled by default.
-* Dev - Add multiple unit tests for the Stripe Express Checkout Element implementation (for both frontend and backend).
-* Fix - Check if taxes are enabled when applying ECE tax compatibility check.
-* Fix - Fix ECE error when initial address on load is not defined as a shipping zone.
-* Fix - Corrected card brand capitalization on the My Account → Subscription page.
-* Fix - Displays a specific message when an authentication error occurs during checkout for 3DS cards (shortcode version).
-* Fix - Show 'Use a New Payment Method' radio button for logged in users only when card saving is enabled.
-* Fix - Fix the display and usage of the Link payment method on the shortcode checkout page with the Stripe Express Checkout Element.
-* Fix - Fix payment methods count on settings page.
-* Update - Improve Express Payment button previews on the edit Block Checkout and Cart pages for Google Pay and Apple Pay.
-* Tweak - Add error logging in ECE critical Ajax requests.
-* Add - Add support for Stripe Link payments via the new Stripe Checkout Element on the block cart and block checkout pages.
-* Add - Add support for Stripe Link payments via the new Stripe Checkout Element on the product, cart, checkout and pay for order pages.
-* Add - Show ECE button preview on settings page.
-* Tweak - Remove the subscription order notes added each time a source wasn't migrated.
-* Fix - Prevent marking renewal orders as processing/completed multiple times due to handling the Stripe webhook in parallel.
+= 9.1.0 - xxxx-xx-xx =
+* Add - Display Multibanco payment instruction details in Order Received page and Order Confirmation email.
+* Tweak - Add the transaction limit information to the Afterpay/Clearpay method when listing payment methods.
+* Tweak - Add transaction threshold information to Affirm when listing payment methods.
+* Fix - Handles additional fields when checking out using ECE on the block checkout.
+* Dev - Introduces new payment method name constants for the frontend.
+* Dev - Improves the missing intent params error log by appending the payment information array.
+* Tweak - Improve error message displayed when payment method creation fails in classic checkout.
+* Tweak - Display email address for Link saved payment methods.
+* Fix - Only update order status for a Radar review closed event when the order was already captured.
+* Dev - Introduces a new class with payment intent statuses constants.
+* Add - Correctly handles charge expired webhook events, setting the order status to failed and adding a note.
+* Fix - Allow account creation on checkout, if enabled, when purchasing subscriptions using ECE.
+* Tweak - Add empty check for cart when checking for allowed products for express checkout.
+* Update - Prevent editing of orders awaiting payment capture.
+* Add - Introduce locking and unlocking in refund flow to prevent double refund due to race condition.
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce-gateway-stripe/trunk/changelog.txt).

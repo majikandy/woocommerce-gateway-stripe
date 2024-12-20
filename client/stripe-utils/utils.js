@@ -6,6 +6,8 @@ import {
 	errorTypes,
 	errorCodes,
 	getPaymentMethodsConstants,
+	PAYMENT_METHOD_LINK,
+	PAYMENT_METHOD_CARD,
 } from './constants';
 
 /**
@@ -248,15 +250,15 @@ export const getPaymentMethodTypes = ( paymentMethodType = null ) => {
 		}
 
 		// If we're on the My Account > Add payment method page make sure we only support the card paymentMethodType.
-		return [ 'card' ];
+		return [ PAYMENT_METHOD_CARD ];
 	}
 
 	const paymentMethodTypes = [ paymentMethodType ];
 	if (
-		paymentMethodType === 'card' &&
+		paymentMethodType === PAYMENT_METHOD_CARD &&
 		isLinkEnabled( paymentMethodsConfig )
 	) {
-		paymentMethodTypes.push( 'link' );
+		paymentMethodTypes.push( PAYMENT_METHOD_LINK );
 	}
 	return paymentMethodTypes;
 };
@@ -414,6 +416,32 @@ export const getUpeSettings = () => {
 	}
 
 	return upeSettings;
+};
+
+/**
+ * Craft the defaultValues parameter, used to pre-fill
+ * user email and phone number for Link in the Payment Element.
+ *
+ * @return {Object} The defaultValues object for the Payment Element.
+ */
+export const getDefaultValues = () => {
+	const userEmail = document.getElementById( 'billing_email' )?.value;
+	if ( ! userEmail ) {
+		return {};
+	}
+
+	const userPhone =
+		document.getElementById( 'billing_phone' )?.value ||
+		document.getElementById( 'shipping_phone' )?.value;
+
+	return {
+		defaultValues: {
+			billingDetails: {
+				email: userEmail,
+				phone: userPhone,
+			},
+		},
+	};
 };
 
 /**

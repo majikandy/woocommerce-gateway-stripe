@@ -481,8 +481,9 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 		$metadata = [
 			__( 'customer_name', 'woocommerce-gateway-stripe' ) => sanitize_text_field( $billing_first_name ) . ' ' . sanitize_text_field( $billing_last_name ),
 			__( 'customer_email', 'woocommerce-gateway-stripe' ) => sanitize_email( $billing_email ),
-			'order_id' => $order->get_order_number(),
-			'site_url' => esc_url( get_site_url() ),
+			'order_id'  => $order->get_order_number(),
+			'site_url'  => esc_url( get_site_url() ),
+			'signature' => $this->get_order_signature( $order ),
 		];
 
 		if ( $this->has_subscription( $order->get_id() ) ) {
@@ -1104,7 +1105,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 		}
 
 		if ( $reason ) {
-			// Trim the refund reason to a max of 500 characters due to Stripe limits: https://stripe.com/docs/api/metadata.
+			// Trim the refund reason to a max of 500 characters due to Stripe limits: https://docs.stripe.com/api/metadata.
 			if ( strlen( $reason ) > 500 ) {
 				$reason = function_exists( 'mb_substr' ) ? mb_substr( $reason, 0, 450 ) : substr( $reason, 0, 450 );
 				// Add some explainer text indicating where to find the full refund reason.
@@ -1129,7 +1130,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 				if ( ! empty( $intent->error ) ) {
 					$response         = $intent;
 					$intent_cancelled = true;
-				} elseif ( 'requires_capture' === $intent->status ) {
+				} elseif ( WC_Stripe_Intent_Status::REQUIRES_CAPTURE === $intent->status ) {
 					$result           = WC_Stripe_API::request(
 						[],
 						'payment_intents/' . $intent->id . '/cancel'
@@ -1149,10 +1150,12 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 			}
 
 			if ( ! $intent_cancelled && 'yes' === $captured ) {
+				$this->lock_order_refund( $order );
 				$response = WC_Stripe_API::request( $request, 'refunds' );
 			}
 		} catch ( WC_Stripe_Exception $e ) {
 			WC_Stripe_Logger::log( 'Error: ' . $e->getMessage() );
+			$this->unlock_order_refund( $order );
 
 			return new WP_Error(
 				'stripe_error',
@@ -1166,6 +1169,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 
 		if ( ! empty( $response->error ) ) { // @phpstan-ignore-line (return statement is added)
 			WC_Stripe_Logger::log( 'Error: ' . $response->error->message );
+			$this->unlock_order_refund( $order );
 
 			return new WP_Error(
 				'stripe_error',
@@ -1207,6 +1211,8 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 			$refund_message = sprintf( __( 'Refunded %1$s - Refund ID: %2$s - Reason: %3$s', 'woocommerce-gateway-stripe' ), $formatted_amount, $response->id, $reason );
 
 			$order->add_order_note( $refund_message );
+			$this->unlock_order_refund( $order );
+
 			WC_Stripe_Logger::log( 'Success: ' . html_entity_decode( wp_strip_all_tags( $refund_message ) ) );
 
 			return true;
@@ -1553,7 +1559,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	 * @return object                   Either an error or the updated intent.
 	 */
 	public function confirm_intent( $intent, $order, $prepared_source ) {
-		if ( 'requires_confirmation' !== $intent->status ) {
+		if ( WC_Stripe_Intent_Status::REQUIRES_CONFIRMATION !== $intent->status ) {
 			return $intent;
 		}
 
@@ -1574,9 +1580,9 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 
 		// Save a note about the status of the intent.
 		$order_id = $order->get_id();
-		if ( 'succeeded' === $confirmed_intent->status ) {
+		if ( WC_Stripe_Intent_Status::SUCCEEDED === $confirmed_intent->status ) {
 			WC_Stripe_Logger::log( "Stripe PaymentIntent $intent->id succeeded for order $order_id" );
-		} elseif ( 'requires_action' === $confirmed_intent->status ) {
+		} elseif ( WC_Stripe_Intent_Status::REQUIRES_ACTION === $confirmed_intent->status ) {
 			WC_Stripe_Logger::log( "Stripe PaymentIntent $intent->id requires authentication for order $order_id" );
 		}
 
@@ -1672,17 +1678,25 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	 * @return bool            A flag that indicates whether the order is already locked.
 	 */
 	public function lock_order_payment( $order, $intent = null ) {
-		$order_id       = $order->get_id();
-		$transient_name = 'wc_stripe_processing_intent_' . $order_id;
-		$processing     = get_transient( $transient_name );
+		$order->read_meta_data( true );
 
-		// Block the process if the same intent is already being handled.
-		if ( '-1' === $processing || ( isset( $intent->id ) && $processing === $intent->id ) ) {
-			return true;
+		$existing_lock = $order->get_meta( '_stripe_lock_payment', true );
+
+		if ( $existing_lock ) {
+			$parts         = explode( '|', $existing_lock ); // Format is: "{expiry_timestamp}" or "{expiry_timestamp}|{pi_xxxx}" if an intent is passed.
+			$expiration    = (int) $parts[0];
+			$locked_intent = ! empty( $parts[1] ) ? $parts[1] : '';
+
+			// If the lock is still active, return true.
+			if ( time() <= $expiration && ( empty( $intent ) || empty( $locked_intent ) || ( $intent->id ?? '' ) === $locked_intent ) ) {
+				return true;
+			}
 		}
 
-		// Save the new intent as a transient, eventually overwriting another one.
-		set_transient( $transient_name, empty( $intent ) ? '-1' : $intent->id, 5 * MINUTE_IN_SECONDS );
+		$new_lock = ( time() + 5 * MINUTE_IN_SECONDS ) . ( isset( $intent->id ) ? '|' . $intent->id : '' );
+
+		$order->update_meta_data( '_stripe_lock_payment', $new_lock );
+		$order->save_meta_data();
 
 		return false;
 	}
@@ -1694,8 +1708,48 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 	 * @param WC_Order $order The order that is being unlocked.
 	 */
 	public function unlock_order_payment( $order ) {
-		$order_id = $order->get_id();
-		delete_transient( 'wc_stripe_processing_intent_' . $order_id );
+		$order->delete_meta_data( '_stripe_lock_payment' );
+		$order->save_meta_data();
+	}
+
+	/**
+	 * Locks an order for refund processing for 5 minutes.
+	 *
+	 * @since 9.1.0
+	 * @param WC_Order $order  The order that is being refunded.
+	 * @return bool            A flag that indicates whether the order is already locked.
+	 */
+	public function lock_order_refund( $order ) {
+		$order->read_meta_data( true );
+
+		$existing_lock = $order->get_meta( '_stripe_lock_refund', true );
+
+		if ( $existing_lock ) {
+			$expiration    = (int) $existing_lock;
+
+			// If the lock is still active, return true.
+			if ( time() <= $expiration ) {
+				return true;
+			}
+		}
+
+		$new_lock = time() + 5 * MINUTE_IN_SECONDS;
+
+		$order->update_meta_data( '_stripe_lock_refund', $new_lock );
+		$order->save_meta_data();
+
+		return false;
+	}
+
+	/**
+	 * Unlocks an order for processing refund.
+	 *
+	 * @since 9.1.0
+	 * @param WC_Order $order The order that is being unlocked.
+	 */
+	public function unlock_order_refund( $order ) {
+		$order->delete_meta_data( '_stripe_lock_refund' );
+		$order->save_meta_data();
 	}
 
 	/**
@@ -1737,7 +1791,7 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 
 		if ( is_wp_error( $setup_intent ) ) {
 			WC_Stripe_Logger::log( "Unable to create SetupIntent for Order #$order_id: " . print_r( $setup_intent, true ) );
-		} elseif ( 'requires_action' === $setup_intent->status ) {
+		} elseif ( WC_Stripe_Intent_Status::REQUIRES_ACTION === $setup_intent->status ) {
 			$order->update_meta_data( '_stripe_setup_intent', $setup_intent->id );
 			$order->save();
 
@@ -2315,5 +2369,24 @@ abstract class WC_Stripe_Payment_Gateway extends WC_Payment_Gateway_CC {
 		}
 
 		return $balance_transaction_id;
+	}
+
+	/**
+	 * Generates a unique signature for an order.
+	 *
+	 * This signature is included as metadata in Stripe requests and used to identify the order when webhooks are received.
+	 *
+	 * @param WC_Order $order The Order object.
+	 * @return string The order's unique signature. Format: order_id:md5(order_id-order_key-customer_id-order_total).
+	 */
+	protected function get_order_signature( $order ) {
+		$signature = [
+			absint( $order->get_id() ),
+			$order->get_order_key(),
+			$order->get_customer_id() ?? '',
+			WC_Stripe_Helper::get_stripe_amount( $order->get_total(), $order->get_currency() ),
+		];
+
+		return sprintf( '%d:%s', $order->get_id(), md5( implode( '-', $signature ) ) );
 	}
 }

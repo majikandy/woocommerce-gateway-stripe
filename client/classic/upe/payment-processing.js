@@ -1,7 +1,10 @@
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	appendPaymentMethodIdToForm,
 	getPaymentMethodTypes,
 	initializeUPEAppearance,
+	isLinkEnabled,
+	getDefaultValues,
 	getStripeServerData,
 	getUpeSettings,
 	showErrorCheckout,
@@ -11,6 +14,13 @@ import {
 	getAdditionalSetupIntentData,
 } from '../../stripe-utils';
 import { getFontRulesFromPage } from '../../styles/upe';
+import {
+	PAYMENT_METHOD_BOLETO,
+	PAYMENT_METHOD_CARD,
+	PAYMENT_METHOD_CASHAPP,
+	PAYMENT_METHOD_MULTIBANCO,
+	PAYMENT_METHOD_WECHAT_PAY,
+} from 'wcstripe/stripe-utils/constants';
 
 const gatewayUPEComponents = {};
 
@@ -79,8 +89,18 @@ function createStripePaymentElement( api, paymentMethodType = null ) {
 	};
 
 	const elements = api.getStripe().elements( options );
+
+	const attachDefaultValuesUpdateEvent = ( element ) => {
+		if ( document.getElementById( element ) ) {
+			document.getElementById( element ).onblur = function () {
+				updatePaymentElementDefaultValues();
+			};
+		}
+	};
+
 	const createdStripePaymentElement = elements.create( 'payment', {
 		...getUpeSettings(),
+		...getDefaultValues(),
 		wallets: {
 			applePay: 'never',
 			googlePay: 'never',
@@ -91,7 +111,31 @@ function createStripePaymentElement( api, paymentMethodType = null ) {
 	gatewayUPEComponents[
 		paymentMethodType
 	].upeElement = createdStripePaymentElement;
+
+	// When email or phone is updated and Link is enabled, we need to
+	// update the payment element to update its default values.
+	if (
+		getStripeServerData()?.isCheckout &&
+		isLinkEnabled() &&
+		paymentMethodType === PAYMENT_METHOD_CARD
+	) {
+		attachDefaultValuesUpdateEvent( 'billing_email' );
+		attachDefaultValuesUpdateEvent( 'billing_phone' );
+	}
+
 	return createdStripePaymentElement;
+}
+
+/**
+ * Updates the payment element's default values.
+ */
+function updatePaymentElementDefaultValues() {
+	if ( ! gatewayUPEComponents?.card?.upeElement ) {
+		return;
+	}
+
+	const paymentElement = gatewayUPEComponents.card.upeElement;
+	paymentElement.update( getDefaultValues() );
 }
 
 /**
@@ -185,7 +229,7 @@ export async function mountStripePaymentElement( api, domElement ) {
 	let paymentMethodType = domElement.dataset.paymentMethodType;
 
 	if ( typeof paymentMethodType === 'undefined' ) {
-		paymentMethodType = 'card';
+		paymentMethodType = PAYMENT_METHOD_CARD;
 	}
 
 	if ( ! gatewayUPEComponents[ paymentMethodType ] ) {
@@ -231,10 +275,50 @@ export const processPayment = (
 
 	const elements = gatewayUPEComponents[ paymentMethodType ].elements;
 
+	const getErrorMessage = ( err ) => {
+		const genericErrorMessage = __(
+			'Payment failed. Please try again.',
+			'woocommerce-gateway-stripe'
+		);
+		if ( ! err ) {
+			return genericErrorMessage;
+		}
+
+		const stripeErrorCodes = [
+			'parameter_invalid_empty',
+			'parameter_missing',
+			'parameter_string_empty',
+			'parameter_string_blank',
+		];
+
+		const errorMessage = err?.message || genericErrorMessage;
+		if ( ! stripeErrorCodes.includes( err.code ) ) {
+			return errorMessage;
+		}
+
+		// err.param is expected to be in the format of <billing|shipping>_details[<field>],
+		// e.g. billing_details[name]
+		const section = err?.param?.match( /(billing|shipping)_/ );
+		const field = err?.param?.match( /\[([A-Za-z0-9]+)\]/ );
+		if ( ! section || ! field || ! section[ 1 ] || ! field[ 1 ] ) {
+			return errorMessage;
+		}
+
+		const toProperCase = ( str ) => {
+			return str ? str.charAt( 0 ).toUpperCase() + str.slice( 1 ) : str;
+		};
+		return sprintf(
+			/* translators: %s is an input field name */
+			__( '%s is a required field.', 'woocommerce-gateway-stripe' ),
+			( section && section[ 1 ]
+				? toProperCase( section[ 1 ] ) + ' '
+				: '' ) + toProperCase( field[ 1 ] )
+		);
+	};
+
 	( async () => {
 		try {
 			await validateElements( elements );
-			let stopFormSubmission = false;
 
 			const paymentMethodObject = await createStripePaymentMethod(
 				api,
@@ -242,10 +326,13 @@ export const processPayment = (
 				jQueryForm,
 				paymentMethodType
 			);
+
 			appendPaymentMethodIdToForm(
 				jQueryForm,
 				paymentMethodObject.paymentMethod.id
 			);
+
+			let stopFormSubmission = false;
 			await additionalActionsHandler(
 				paymentMethodObject.paymentMethod,
 				jQueryForm,
@@ -265,7 +352,7 @@ export const processPayment = (
 		} catch ( err ) {
 			hasCheckoutCompleted = false;
 			jQueryForm.removeClass( 'processing' ).unblock();
-			showErrorCheckout( err.message );
+			showErrorCheckout( getErrorMessage( err ) );
 		}
 	} )();
 
@@ -364,11 +451,11 @@ export const confirmVoucherPayment = async ( api, jQueryForm ) => {
 	try {
 		// Confirm the payment to tell Stripe to display the voucher to the customer.
 		let confirmPayment;
-		if ( paymentMethodType === 'boleto' ) {
+		if ( paymentMethodType === PAYMENT_METHOD_BOLETO ) {
 			confirmPayment = await api
 				.getStripe()
 				.confirmBoletoPayment( clientSecret, {} );
-		} else if ( paymentMethodType === 'multibanco' ) {
+		} else if ( paymentMethodType === PAYMENT_METHOD_MULTIBANCO ) {
 			confirmPayment = await api
 				.getStripe()
 				.confirmMultibancoPayment( clientSecret, {} );
@@ -448,7 +535,7 @@ export const confirmWalletPayment = async ( api, jQueryForm ) => {
 		// Confirm the payment to tell Stripe to display the modal to the customer.
 		let confirmPayment;
 		switch ( paymentMethodType ) {
-			case 'wechat_pay':
+			case PAYMENT_METHOD_WECHAT_PAY:
 				confirmPayment = await api
 					.getStripe()
 					.confirmWechatPayPayment( clientSecret, {
@@ -459,7 +546,7 @@ export const confirmWalletPayment = async ( api, jQueryForm ) => {
 						},
 					} );
 				break;
-			case 'cashapp':
+			case PAYMENT_METHOD_CASHAPP:
 				if ( intentType === 'setup_intent' ) {
 					confirmPayment = await api
 						.getStripe()
