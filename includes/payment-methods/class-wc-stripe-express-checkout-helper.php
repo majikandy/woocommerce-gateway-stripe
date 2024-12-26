@@ -322,14 +322,13 @@ class WC_Stripe_Express_Checkout_Helper {
 	public function get_normalized_postal_code( $postcode, $country ) {
 		/**
 		 * Currently, Apple Pay truncates the UK and Canadian postal codes to the first 4 and 3 characters respectively
+		 * Apple Pay also truncates Canadian postal codes to the first 4 characters.
 		 * when passing it back from the shippingcontactselected object. This causes WC to invalidate
 		 * the postal code and not calculate shipping zones correctly.
 		 */
 		if ( 'GB' === $country ) {
-			// Replaces a redacted string with something like LN10***.
-			return str_pad( preg_replace( '/\s+/', '', $postcode ), 7, '*' );
-			// UK Postcodes returned from Apple Pay can be alpha numeric 2 chars, 3 chars, or 4 chars long will optionally have a trailing space, 
-			// depending on whether the customer put a space in their postcode between the outcode and incode part. 
+			// UK Postcodes returned from Apple Pay can be alpha numeric 2 chars, 3 chars, or 4 chars long will optionally have a trailing space,
+			// depending on whether the customer put a space in their postcode between the outcode and incode part.
 			// See https://assets.publishing.service.gov.uk/media/5a7b997d40f0b62826a049e0/ILRSpecification2013_14Appendix_C_Dec2012_v1.pdf for more details.
 
 			// Here is a table showing the functionality by example:
@@ -343,13 +342,14 @@ class WC_Stripe_Express_Checkout_Helper {
 
 			$spaceless_postcode = preg_replace( '/\s+/', '', $postcode );
 
-			if ( strlen( $spaceless_postcode ) < 5) { 
+			if ( strlen( $spaceless_postcode ) < 5 ) {
 				// Always reintroduce the space so that Shipping Zones regex like 'N1 *' work to match N1 postcodes like N1 1AA, but don't match N10 postcodes like N10 1AA
-				return $spaceless_postcode . ' ***'; 
+				return $spaceless_postcode . ' ***';
 			} else {
 				return $postcode; // 5 or more chars means it probably wasn't redacted and will likely validate unchanged.
 			}
 		}
+
 		if ( 'CA' === $country ) {
 			// Replaces a redacted string with something like L4Y***.
 			return str_pad( preg_replace( '/\s+/', '', $postcode ), 6, '*' );
