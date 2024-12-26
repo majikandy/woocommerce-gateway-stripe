@@ -536,7 +536,7 @@ class WC_Stripe_Payment_Request {
 			
 			if ( strlen( $spaceless_postcode ) < 5) { 
 				// Always reintroduce the space so that Shipping Zones regex like 'N1 *' work to match N1 postcodes like N1 1AA, but don't match N10 postcodes like N10 1AA
-				return $spaceless_postcode . " ***"; 
+				return $spaceless_postcode . ' ***'; 
 			} else {
 				return $postcode; // 5 or more chars means it probably wasn't redacted and will likely validate unchanged.
 			}
